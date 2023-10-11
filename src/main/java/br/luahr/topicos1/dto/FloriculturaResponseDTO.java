@@ -10,8 +10,8 @@ public record FloriculturaResponseDTO(
 ) {
     public FloriculturaResponseDTO(Floricultura floricultura){
         this(floricultura.getId(),
-            floricultura.getNome(),
-            floricultura.getCnpj()
-            );
+             floricultura.getNome(),
+             floricultura.getCnpj()
+        );
     }
 }

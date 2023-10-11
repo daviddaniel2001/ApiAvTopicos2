@@ -4,7 +4,6 @@ import java.util.List;
 
 import br.luahr.topicos1.dto.FloriculturaDTO;
 import br.luahr.topicos1.dto.FloriculturaResponseDTO;
-import br.luahr.topicos1.dto.UsuarioResponseDTO;
 
 public interface FloriculturaService {
     
