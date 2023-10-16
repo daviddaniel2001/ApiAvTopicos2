@@ -1,5 +1,6 @@
 package br.luahr.topicos1.dto;
 
+import br.luahr.topicos1.model.Compra;
 import br.luahr.topicos1.model.Endereco;
 import br.luahr.topicos1.model.Telefone;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +25,9 @@ public record TransportadoraDTO(
     Integer valorEntrega,
 
     @NotBlank(message = "O tempo para a entrega deve ser informado.")
-    String tempoEstimado 
+    String tempoEstimado,
+
+    Compra compra
 
 ) {
     

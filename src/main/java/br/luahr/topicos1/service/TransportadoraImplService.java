@@ -51,6 +51,7 @@ public class TransportadoraImplService implements TransportadoraService{
         entity.setMetodoEntrega(transportadoraDTO.metodoEntrega());
         entity.setValorEntrega(transportadoraDTO.valorEntrega());
         entity.setTempoEstimado(transportadoraDTO.tempoEstimado());
+        entity.setCompra(transportadoraDTO.compra());
 
         return new TransportadoraResponseDTO(entity);
     }
@@ -66,6 +67,7 @@ public class TransportadoraImplService implements TransportadoraService{
         entity.setMetodoEntrega(transportadoraDTO.metodoEntrega());
         entity.setValorEntrega(transportadoraDTO.valorEntrega());
         entity.setTempoEstimado(transportadoraDTO.tempoEstimado());
+        entity.setCompra(transportadoraDTO.compra());
 
         return new TransportadoraResponseDTO(entity);
     }

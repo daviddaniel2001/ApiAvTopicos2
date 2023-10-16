@@ -20,7 +20,9 @@ public class Transportadora extends DefaultEntity {
 
     private String tempoEstimado;
 
-    
+    @ManyToOne
+    private Compra compra;
+
     public String getNome() {
         return nome;
     }
@@ -67,6 +69,14 @@ public class Transportadora extends DefaultEntity {
 
     public void setTempoEstimado(String tempoEstimado) {
         this.tempoEstimado = tempoEstimado;
+    }
+
+    public Compra getCompra() {
+        return compra;
+    }
+
+    public void setCompra(Compra compra) {
+        this.compra = compra;
     }
 
 }

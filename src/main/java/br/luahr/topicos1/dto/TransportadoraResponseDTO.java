@@ -1,5 +1,6 @@
 package br.luahr.topicos1.dto;
 
+import br.luahr.topicos1.model.Compra;
 import br.luahr.topicos1.model.Endereco;
 import br.luahr.topicos1.model.Telefone;
 import br.luahr.topicos1.model.Transportadora;
@@ -12,7 +13,8 @@ public record TransportadoraResponseDTO(
     Endereco endereco, 
     String metodoEntrega,
     Integer valorEntrega, 
-    String tempoEstimado
+    String tempoEstimado,
+    Compra compra
 ) {
     public TransportadoraResponseDTO(Transportadora transportadora) {
        this(transportadora.getId(),
@@ -21,7 +23,8 @@ public record TransportadoraResponseDTO(
             transportadora.getEndereco(), 
             transportadora.getMetodoEntrega(), 
             transportadora.getValorEntrega(), 
-            transportadora.getTempoEstimado() 
+            transportadora.getTempoEstimado(),
+            transportadora.getCompra()
        );
     }
 }
