@@ -1,5 +1,8 @@
 package br.luahr.topicos1.model;
 
+
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 
@@ -10,7 +13,7 @@ public class CupomDesconto extends DefaultEntity{
 
     private String valorDesconto;
 
-    private String validade;
+    private LocalDate validade;
 
     @OneToOne
     private Compra compra;
@@ -31,11 +34,11 @@ public class CupomDesconto extends DefaultEntity{
         this.valorDesconto = valorDesconto;
     }
 
-    public String getValidade() {
+    public LocalDate getValidade() {
         return validade;
     }
 
-    public void setValidade(String validade) {
+    public void setValidade(LocalDate validade) {
         this.validade = validade;
     }
 

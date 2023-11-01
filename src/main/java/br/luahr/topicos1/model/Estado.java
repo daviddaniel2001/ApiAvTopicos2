@@ -9,10 +9,11 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Estado extends DefaultEntity{
-    @Column(length = 50)
+    
+    @Column(nullable = false ,length = 50)
     private String nome;
     
-    @Column(length = 2)
+    @Column(nullable = false ,length = 2)
     private String sigla;
 
     @OneToMany(mappedBy = "estado")

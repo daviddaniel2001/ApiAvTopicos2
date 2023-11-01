@@ -1,5 +1,7 @@
 package br.luahr.topicos1.dto;
 
+import java.time.LocalDate;
+
 import br.luahr.topicos1.model.Compra;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,7 +16,7 @@ public record CupomDescontoDTO(
     String valorDesconto, 
 
     @NotBlank(message = "A data de validade do cupom deve ser informado.")
-    String validade, 
+    LocalDate validade, 
 
     Compra compra 
 ) {

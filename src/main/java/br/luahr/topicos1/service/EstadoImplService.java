@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
 
@@ -18,55 +19,55 @@ import br.luahr.topicos1.model.Estado;
 import br.luahr.topicos1.repository.EstadoRepository;
 
 @ApplicationScoped
-public class EstadoImplService implements EstadoService{
+public class EstadoImplService implements EstadoService {
 
     @Inject
     EstadoRepository estadoRepository;
 
     @Inject
     Validator validator;
-    
+
     @Override
-    public List<EstadoResponseDTO> getAll() {
-        return estadoRepository.findAll()
-                                        .stream()
-                                        .map(EstadoResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<EstadoResponseDTO> getAll(int page, int pageSize) {
+
+        List<Estado> list = estadoRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> EstadoResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public EstadoResponseDTO findById(Long id) {
         Estado estado = estadoRepository.findById(id);
-        if (estado == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new EstadoResponseDTO(estado);
+        if(estado == null)
+            throw new NotFoundException("Estado não encontrado.");
+        return EstadoResponseDTO.valueOf(estado);
     }
 
     @Override
     @Transactional
-    public EstadoResponseDTO create(EstadoDTO estadoDTO) {
-        validar(estadoDTO);
+    public EstadoResponseDTO create(@Valid EstadoDTO estadoDTO) throws ConstraintViolationException {
+        //validar(estadoDTO);
 
         Estado entity = new Estado();
+
         entity.setNome(estadoDTO.nome());
         entity.setSigla(estadoDTO.sigla());
 
         estadoRepository.persist(entity);
 
-        return new EstadoResponseDTO(entity);
+        return EstadoResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
-    public EstadoResponseDTO update(Long id, EstadoDTO estadoDTO) throws ConstraintViolationException{
+    public EstadoResponseDTO update(Long id, EstadoDTO estadoDTO) throws ConstraintViolationException {
         validar(estadoDTO);
 
         Estado entity = estadoRepository.findById(id);
+
         entity.setNome(estadoDTO.nome());
         entity.setSigla(estadoDTO.sigla());
 
-        return new EstadoResponseDTO(entity);
+        return EstadoResponseDTO.valueOf(entity);
     }
 
     private void validar(EstadoDTO estadoDTO) throws ConstraintViolationException {
@@ -80,33 +81,24 @@ public class EstadoImplService implements EstadoService{
 
     @Override
     @Transactional
-    public void delete(Long id) throws IllegalArgumentException, NotFoundException{
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Estado estado = estadoRepository.findById(id);
-
-        if (estadoRepository.isPersistent(estado)){
-            estadoRepository.delete(estado);
-        }else
-            throw new NotFoundException("Nenhum usuario encontrado");
+    public void delete(Long id) {
+        estadoRepository.deleteById(id);
     }
-
-    @Override
-    public List<EstadoResponseDTO> findByNome(String nome)  throws NotFoundException{
-        List<Estado> list = estadoRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
-
-        return list.stream()
-                    .map(EstadoResponseDTO::new)
-                    .collect(Collectors.toList());
-    }
-
+    
     @Override
     public long count() {
         return estadoRepository.count();
     }
-    
+
+    @Override
+    public List<EstadoResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Estado> list = estadoRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> EstadoResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByNome(String nome) {
+        return estadoRepository.findByNome(nome).count();
+    }
+
 }
