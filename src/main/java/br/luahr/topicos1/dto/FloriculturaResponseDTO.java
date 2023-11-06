@@ -8,10 +8,11 @@ public record FloriculturaResponseDTO(
     String nome, 
     String cnpj
 ) {
-    public FloriculturaResponseDTO(Floricultura floricultura){
-        this(floricultura.getId(),
-             floricultura.getNome(),
-             floricultura.getCnpj()
+    public static FloriculturaResponseDTO valueOf(Floricultura floricultura){
+        return new FloriculturaResponseDTO(
+            floricultura.getId(),
+            floricultura.getNome(),
+            floricultura.getCnpj()
         );
     }
 }

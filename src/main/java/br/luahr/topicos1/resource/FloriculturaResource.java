@@ -1,6 +1,7 @@
 package br.luahr.topicos1.resource;
 
 import java.util.List;
+import org.jboss.logging.Logger;
 
 import br.luahr.topicos1.application.Result;
 import br.luahr.topicos1.dto.FloriculturaDTO;
@@ -29,6 +30,8 @@ public class FloriculturaResource {
 
     @Inject
     FloriculturaService floriculturaService;
+
+    private static final Logger LOG = Logger.getLogger(FloriculturaResource.class);
 
     @GET
     @RolesAllowed({ "Admin", "User" })

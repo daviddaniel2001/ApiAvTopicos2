@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
 
@@ -26,63 +27,62 @@ public class FloriculturaServiceImpl implements FloriculturaService {
     Validator validator;
 
     @Override
-    public List<FloriculturaResponseDTO> getAll() {
-        return floriculturaRepository.findAll()
-                .stream()
-                .map(FloriculturaResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<FloriculturaResponseDTO> getAll(int page, int pageSize) {
+
+        List<Floricultura> list = floriculturaRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> FloriculturaResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public FloriculturaResponseDTO findById(Long id) {
         Floricultura floricultura = floriculturaRepository.findById(id);
         if (floricultura == null)
-            throw new NotFoundException("Não encontrado.");
-        return new FloriculturaResponseDTO(floricultura);
+            throw new NotFoundException("Floricultura não encontrada.");
+        return FloriculturaResponseDTO.valueOf(floricultura);
     }
 
     @Override
-    public FloriculturaResponseDTO create(FloriculturaDTO floriculturaDTO) throws ConstraintViolationException {
-        validar(floriculturaDTO);
+    public FloriculturaResponseDTO create(@Valid FloriculturaDTO floriculturaDTO) throws ConstraintViolationException {
+        // validar (floriculturaDTO);
 
-        var entity = new Floricultura();
+        Floricultura entity = new Floricultura();
         entity.setNome(floriculturaDTO.nome());
         entity.setCnpj(floriculturaDTO.cnpj());
 
         floriculturaRepository.persist(entity);
 
-        return new FloriculturaResponseDTO(entity);
+        return FloriculturaResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
-    public FloriculturaResponseDTO update(Long id, FloriculturaDTO floriculturaDTO)throws ConstraintViolationException {
+    public FloriculturaResponseDTO update(Long id, FloriculturaDTO floriculturaDTO)
+            throws ConstraintViolationException {
         validar(floriculturaDTO);
 
         Floricultura entity = floriculturaRepository.findById(id);
+
         entity.setNome(floriculturaDTO.nome());
         entity.setCnpj(floriculturaDTO.cnpj());
 
-        return new FloriculturaResponseDTO(entity);
+        return FloriculturaResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        if(id == null)
-           throw new IllegalArgumentException("Número inválido");
-
-        Floricultura floricultura = floriculturaRepository.findById(id);
-
-        if(floriculturaRepository.isPersistent(floricultura)) {
-            floriculturaRepository.delete(floricultura);
-        }else
-            throw new NotFoundException("Nenhuma floricultura encontrada.");
+        floriculturaRepository.deleteById(id);
     }
 
     @Override
     public long count() {
         return floriculturaRepository.count();
+    }
+
+    @Override
+    public List<FloriculturaResponseDTO> findByNome(String nome, int page, int pageSize) {
+         List<Floricultura> list = floriculturaRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> FloriculturaResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     private void validar(FloriculturaDTO floriculturaDTO) throws ConstraintViolationException {
@@ -92,5 +92,10 @@ public class FloriculturaServiceImpl implements FloriculturaService {
         if (!violations.isEmpty())
             throw new ConstraintViolationException(violations);
 
+    }
+
+    @Override
+    public long countByNome(String nome) {
+        return floriculturaRepository.findByNome(nome).count();
     }
 }
