@@ -47,7 +47,6 @@ public class EstadoResource {
         return estadoService.getAll(page, pageSize);
     }
   
-    } 
     @GET
     @Path("/{id}")
     public EstadoResponseDTO findById(@PathParam("id") Long id) {
