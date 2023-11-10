@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import br.luahr.topicos1.model.Usuario;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,7 +15,6 @@ import jakarta.ws.rs.NotFoundException;
 import br.luahr.topicos1.dto.CompraDTO;
 import br.luahr.topicos1.dto.CompraResponseDTO;
 import br.luahr.topicos1.model.Compra;
-import br.luahr.topicos1.model.Flor;
 import br.luahr.topicos1.repository.UsuarioRepository;
 import br.luahr.topicos1.repository.CompraRepository;
 import br.luahr.topicos1.repository.FlorRepository;
@@ -37,23 +35,22 @@ public class CompraImplService implements CompraService {
     Validator validator;
 
     @Override
-    public List<CompraResponseDTO> getAll() {
-        return compraRepository.findAll()
-                                        .stream()
-                                        .map(CompraResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<CompraResponseDTO> getAll(int page, int pageSize) {
+
+        List<Compra> list = compraRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> CompraResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public CompraResponseDTO findById(Long id) {
         Compra compra = compraRepository.findById(id);
         if (compra == null)
-            return null;
-        return new CompraResponseDTO(compra);
+            throw new NotFoundException("Compra não encontrada.");
+        return CompraResponseDTO.valueOf(compra);
     }
 
-    private void validar(CompraDTO compradto) throws ConstraintViolationException {
-        Set<ConstraintViolation<CompraDTO>> violations = validator.validate(compradto);
+    private void validar(CompraDTO compraDTO) throws ConstraintViolationException {
+        Set<ConstraintViolation<CompraDTO>> violations = validator.validate(compraDTO);
         if (!violations.isEmpty())
             throw new ConstraintViolationException(violations);
     }
@@ -61,36 +58,30 @@ public class CompraImplService implements CompraService {
     @Override
     @Transactional
     public CompraResponseDTO create(CompraDTO compraDTO) throws ConstraintViolationException {
-        validar(compraDTO);
+        // validar(compraDTO);
 
         Compra entity = new Compra();
-        Usuario usuario = usuarioRepository.findById(compraDTO.idCliente());
-        entity.setCliente(usuario);
-
-        Flor flor = florRepository.findById(compraDTO.idProduto());
-        entity.setItemProduto(flor);
-
-        entity.setQuantidadeProduto(compraDTO.quantidaProduto());
-        entity.setTotalCompra(compraDTO.totalCompra());
+        entity.setCliente(compraDTO.usuario());
+        entity.setItemProduto(compraDTO.itemProduto());
+        entity.setQuantidadeProduto(compraDTO.quantidadeProduto());
 
         compraRepository.persist(entity);
 
-        return new CompraResponseDTO(entity);
+        return CompraResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
-    public CompraResponseDTO update(Long id, CompraDTO compradto) {
-        Compra compraUpdate = compraRepository.findById(id);
-        if (compraUpdate == null)
-            throw new NotFoundException("Compra nÃ£o encontrada.");
-        validar(compradto);
+    public CompraResponseDTO update(Long id, CompraDTO compraDTO) {
+        validar(compraDTO);
 
-        compraUpdate.setItemProduto(compraUpdate.getItemProduto());
-        compraUpdate.setQuantidadeProduto(compradto.quantidaProduto());
+        Compra entity = compraRepository.findById(id);
 
-        compraRepository.persist(compraUpdate);
-        return new CompraResponseDTO(compraUpdate);
+        entity.setCliente(compraDTO.usuario());
+        entity.setItemProduto(compraDTO.itemProduto());
+        entity.setQuantidadeProduto(compraDTO.quantidadeProduto());
+
+        return CompraResponseDTO.valueOf(entity);
     }
 
     @Override
@@ -100,19 +91,20 @@ public class CompraImplService implements CompraService {
     }
 
     @Override
-    public Long count() {
+    public long count() {
         return compraRepository.count();
     }
 
     @Override
-    public List<CompraResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Compra> list = compraRepository.findByNome(nome);
+    public List<CompraResponseDTO> findByItemProduto(Integer itemProduto, int page, int pageSize) {
 
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
+        List<Compra> list = compraRepository.findByItemProduto(itemProduto).page(page, pageSize).list();
+        return list.stream().map(e -> CompraResponseDTO.valueOf(e)).collect(Collectors.toList());
 
-        return list.stream()
-                .map(CompraResponseDTO::new)
-                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByItemProduto(Integer itemProduto) {
+        return compraRepository.findByItemProduto(itemProduto).count();
     }
 }

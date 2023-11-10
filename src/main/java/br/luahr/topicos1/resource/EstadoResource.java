@@ -6,7 +6,6 @@ import org.jboss.logging.Logger;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -54,7 +53,7 @@ public class EstadoResource {
     }
 
     @POST
-    //@RolesAllowed({ "Admin" , "User"})
+    @RolesAllowed({ "Admin" , "User"})
     public Response insert(EstadoDTO estadoDTO) {
         LOG.infof("Inserindo um estado: %s",estadoDTO.nome());
 
@@ -65,10 +64,7 @@ public class EstadoResource {
 
     @PUT
     @Path("/{id}")
-    /* @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    @RolesAllowed({ "Admin" }) */
+    @RolesAllowed({ "Admin" })
     public Response update(@PathParam("id") Long id, EstadoDTO estadoDTO) {
         try {
             EstadoResponseDTO estado = estadoService.update(id, estadoDTO);
@@ -81,7 +77,7 @@ public class EstadoResource {
 
     @DELETE
     @Path("/{id}")
-    /* @RolesAllowed({ "Admin" }) */
+    @RolesAllowed({ "Admin" })
     public Response delete(@PathParam("id") Long id) {
         estadoService.delete(id);
         return Response.status(Status.NO_CONTENT).build();
@@ -89,7 +85,7 @@ public class EstadoResource {
 
     @GET
     @Path("/search/{nome}/count")
-    /*@RolesAllowed({ "Admin", "User" })*/
+    @RolesAllowed({ "Admin", "User" })
     public long count(@PathParam("nome") String nome){
         return estadoService.countByNome(nome);
     }

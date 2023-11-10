@@ -1,20 +1,24 @@
 package br.luahr.topicos1.dto;
 
 import br.luahr.topicos1.model.Compra;
+import br.luahr.topicos1.model.Flor;
+import br.luahr.topicos1.model.Usuario;
 
 public record CompraResponseDTO(
     Long id,
-    UsuarioResponseDTO cliente,
-    FlorResponseDTO produto,
-    Integer quantidadeProduto,
-    Double totalCompra
+    Usuario usuario,
+    Flor itemProduto,
+    Integer quantidadeProduto
+
 ){
-    public CompraResponseDTO(Compra compra){
-        this(
+
+    public static CompraResponseDTO valueOf(Compra compra) {
+        return new CompraResponseDTO(
             compra.getId(),
-            new UsuarioResponseDTO(compra.getCliente()),
-            new FlorResponseDTO(compra.getItemProduto()),
-            compra.getQuantidadeProduto(),
-            compra.getTotalCompra());
+            compra.getCliente(),
+            compra.getItemProduto(),
+            compra.getQuantidadeProduto()
+
+        );
     }
 }

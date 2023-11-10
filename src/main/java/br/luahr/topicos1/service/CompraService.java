@@ -3,19 +3,22 @@ package br.luahr.topicos1.service;
 import java.util.List;
 import br.luahr.topicos1.dto.CompraDTO;
 import br.luahr.topicos1.dto.CompraResponseDTO;
+import jakarta.validation.Valid;
 
 public interface CompraService {
-    List<CompraResponseDTO> getAll();
+    List<CompraResponseDTO> getAll(int page, int pageSize);
 
     CompraResponseDTO findById(Long id);
 
-    CompraResponseDTO create(CompraDTO compradto);
+    CompraResponseDTO create(@Valid CompraDTO compradto);
 
     CompraResponseDTO update(Long id, CompraDTO compradto);
 
     void delete(Long id);
 
-    Long count();
+    List<CompraResponseDTO> findByItemProduto(Integer itemProduto, int page, int pageSize);
 
-    List<CompraResponseDTO> findByNome(String nome);
+    long count();
+
+    long countByItemProduto(Integer itemProduto);
 }
