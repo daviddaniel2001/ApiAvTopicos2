@@ -13,12 +13,12 @@ public record CupomDescontoResponseDTO(
     LocalDate validade, 
     Compra compra
 ) {
-    public CupomDescontoResponseDTO(CupomDesconto cupomDesconto) {
-        this(cupomDesconto.getId(),
-             cupomDesconto.getCodigo(),
-             cupomDesconto.getValorDesconto(),
-             cupomDesconto.getValidade(),
-             cupomDesconto.getCompra()
-             );
+    public static CupomDescontoResponseDTO valueOf(CupomDesconto cupomDesconto){
+        return new CupomDescontoResponseDTO(
+            cupomDesconto.getId(),
+            cupomDesconto.getCodigo(),
+            cupomDesconto.getValorDesconto(), cupomDesconto.getValidade(),
+            cupomDesconto.getCompra()
+        );
     }
 }

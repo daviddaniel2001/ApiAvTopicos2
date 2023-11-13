@@ -12,6 +12,7 @@ import br.luahr.topicos1.model.CupomDesconto;
 import br.luahr.topicos1.repository.CupomDescontoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -27,61 +28,52 @@ public class CupomDescontoImplService implements CupomDescontoService {
     Validator validator;
 
     @Override
-    public List<CupomDescontoResponseDTO> getAll() {
-        return cupomDescontoRepository.findAll()
-                .stream()
-                .map(CupomDescontoResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<CupomDescontoResponseDTO> getAll(int page, int pageSize) {
+        List<CupomDesconto> list = cupomDescontoRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> CupomDescontoResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public CupomDescontoResponseDTO findById(Long id) {
         CupomDesconto cupomDesconto = cupomDescontoRepository.findById(id);
-        if (cupomDesconto == null)
-            throw new NotFoundException("Não encontrado.");
-        return new CupomDescontoResponseDTO(cupomDesconto);
+        if(cupomDesconto == null)
+            throw new NotFoundException("Cupom não encontrado.");
+        return CupomDescontoResponseDTO.valueOf(cupomDesconto);
     }
 
     @Override
     public CupomDescontoResponseDTO create(CupomDescontoDTO cupomDescontoDTO) {
-        validar(cupomDescontoDTO);
+        //validar(cupomDescontoDTO);
 
-        var entity = new CupomDesconto();
+        CupomDesconto entity = new CupomDesconto();
 
         entity.setCodigo(cupomDescontoDTO.codigo());
         entity.setValorDesconto(cupomDescontoDTO.valorDesconto());
         entity.setValidade(cupomDescontoDTO.validade());
-        entity.setCompra(cupomDescontoDTO.compra());
-
+        
         cupomDescontoRepository.persist(entity);
 
-        return new CupomDescontoResponseDTO(entity);
+        return CupomDescontoResponseDTO.valueOf(entity);
     }
 
     @Override
+    @Transactional
     public CupomDescontoResponseDTO update(Long id, CupomDescontoDTO cupomDescontoDTO) {
         validar(cupomDescontoDTO);
 
         CupomDesconto entity = cupomDescontoRepository.findById(id);
+
         entity.setCodigo(cupomDescontoDTO.codigo());
         entity.setValorDesconto(cupomDescontoDTO.valorDesconto());
         entity.setValidade(cupomDescontoDTO.validade());
-        entity.setCompra(cupomDescontoDTO.compra());
 
-        return new CupomDescontoResponseDTO(entity);
+        return CupomDescontoResponseDTO.valueOf(entity);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        CupomDesconto cupomDesconto = cupomDescontoRepository.findById(id);
-
-        if (cupomDescontoRepository.isPersistent(cupomDesconto)) {
-            cupomDescontoRepository.delete(cupomDesconto);
-        } else
-            throw new NotFoundException("Nenhum cupom encontrado.");
+        cupomDescontoRepository.deleteById(id);
     }
 
     @Override
@@ -95,5 +87,16 @@ public class CupomDescontoImplService implements CupomDescontoService {
 
         if(!violations.isEmpty())
             throw new ConstraintViolationException(violations);
+    }
+
+    @Override
+    public List<CupomDescontoResponseDTO> findByValorDesconto(String valorDesconto, int page, int pageSize) {
+        List<CupomDesconto> list = cupomDescontoRepository.findByValorDesconto(valorDesconto).page(page, pageSize).list();
+        return list.stream().map(e-> CupomDescontoResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByValorDesconto(String valorDesconto) {
+        return cupomDescontoRepository.findByValorDesconto(valorDesconto).count();
     }
 }
