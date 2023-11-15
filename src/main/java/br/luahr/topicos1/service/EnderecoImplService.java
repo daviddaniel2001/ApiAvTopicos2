@@ -11,16 +11,14 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
-
 import br.luahr.topicos1.dto.EnderecoDTO;
 import br.luahr.topicos1.dto.EnderecoResponseDTO;
 import br.luahr.topicos1.model.Endereco;
-import br.luahr.topicos1.model.Municipio;
 import br.luahr.topicos1.repository.EnderecoRepository;
 import br.luahr.topicos1.repository.MunicipioRepository;
 
 @ApplicationScoped
-public class EnderecoImplService implements EnderecoService{
+public class EnderecoImplService implements EnderecoService {
     @Inject
     EnderecoRepository enderecoRepository;
 
@@ -31,59 +29,49 @@ public class EnderecoImplService implements EnderecoService{
     Validator validator;
 
     @Override
-    public List<EnderecoResponseDTO> getAll() {
-        return enderecoRepository.findAll()
-                                        .stream()
-                                        .map(EnderecoResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<EnderecoResponseDTO> getAll(int page, int pageSize) {
+        List<Endereco> list = enderecoRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> EnderecoResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public EnderecoResponseDTO findById(Long id) {
         Endereco endereco = enderecoRepository.findById(id);
-        if (endereco == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new EnderecoResponseDTO(endereco);
+        if(endereco == null)
+            throw new NotFoundException("Endereco não encontrado.");
+        return EnderecoResponseDTO.valueOf(endereco);
     }
 
     @Override
     @Transactional
-    public EnderecoResponseDTO create(EnderecoDTO enderecoDTO) throws ConstraintViolationException{
-        validar(enderecoDTO);
+    public EnderecoResponseDTO create(EnderecoDTO enderecoDTO) throws ConstraintViolationException {
+        //validar(enderecoDTO);
 
         Endereco entity = new Endereco();
+
         entity.setBairro(enderecoDTO.bairro());
         entity.setNumero(enderecoDTO.numero());
         entity.setComplemento(enderecoDTO.complemento());
         entity.setCep(enderecoDTO.cep());
-
-        Municipio municipio = municipioRepository.findById(enderecoDTO.idMunicipio());
-
-        entity.setMunicipio(municipio);
 
         enderecoRepository.persist(entity);
 
-        return new EnderecoResponseDTO(entity);
+        return EnderecoResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
-    public EnderecoResponseDTO update(Long id, EnderecoDTO enderecoDTO)  throws ConstraintViolationException{
+    public EnderecoResponseDTO update(Long id, EnderecoDTO enderecoDTO) throws ConstraintViolationException {
         validar(enderecoDTO);
 
-        var entity = enderecoRepository.findById(id);
+        Endereco entity = enderecoRepository.findById(id);
+        
         entity.setBairro(enderecoDTO.bairro());
         entity.setNumero(enderecoDTO.numero());
         entity.setComplemento(enderecoDTO.complemento());
         entity.setCep(enderecoDTO.cep());
-        Municipio municipio = municipioRepository.findById(enderecoDTO.idMunicipio());
-        if (!entity.getMunicipio().getId().equals(municipio.getId())) {
-            entity.setMunicipio(municipio);
-        }
-
-
-        return new EnderecoResponseDTO(entity);
+        
+        return EnderecoResponseDTO.valueOf(entity);
     }
 
     private void validar(EnderecoDTO enderecoDTO) throws ConstraintViolationException {
@@ -96,15 +84,9 @@ public class EnderecoImplService implements EnderecoService{
     }
 
     @Override
-    public List<EnderecoResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Endereco> list = enderecoRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum endereço encontrado");
-
-        return list.stream()
-                        .map(EnderecoResponseDTO::new)
-                        .collect(Collectors.toList());
+    @Transactional
+    public void delete(Long id) throws IllegalArgumentException, NotFoundException {
+        enderecoRepository.deleteById(id);
     }
 
     @Override
@@ -113,16 +95,14 @@ public class EnderecoImplService implements EnderecoService{
     }
 
     @Override
-    @Transactional
-    public void delete(Long id) throws IllegalArgumentException, NotFoundException {
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Endereco endereco = enderecoRepository.findById(id);
-
-        if (enderecoRepository.isPersistent(endereco)) {
-            enderecoRepository.delete(endereco);
-        } else
-            throw new NotFoundException("Nenhum usuario encontrado");
+    public List<EnderecoResponseDTO> findByCep(String cep, int page, int pageSize) {
+        List<Endereco> list = enderecoRepository.findByCep(cep).page(page, pageSize).list();
+        return list.stream().map(e-> EnderecoResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
+
+    @Override
+    public long countByCep(String cep) {
+        return enderecoRepository.findByCep(cep).count();
+    }
+
 }

@@ -65,8 +65,6 @@ public class CupomDescontoResource {
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response update(@PathParam("Id") Long id, CupomDescontoDTO cupomDescontoDTO) {
         try {

@@ -4,14 +4,15 @@ import java.util.List;
 
 import br.luahr.topicos1.dto.EnderecoDTO;
 import br.luahr.topicos1.dto.EnderecoResponseDTO;
+import jakarta.validation.Valid;
 
 public interface EnderecoService {
     // recursos basicos
-    List<EnderecoResponseDTO> getAll();
+    List<EnderecoResponseDTO> getAll(int page, int pageSize);
 
     EnderecoResponseDTO findById(Long id);
 
-    EnderecoResponseDTO create(EnderecoDTO productDTO);
+    EnderecoResponseDTO create(@Valid EnderecoDTO productDTO);
 
     EnderecoResponseDTO update(Long id, EnderecoDTO productDTO);
 
@@ -19,7 +20,9 @@ public interface EnderecoService {
 
     // recursos extras
 
-    List<EnderecoResponseDTO> findByNome(String nome);
+    List<EnderecoResponseDTO> findByCep(String cep, int page, int pageSize);
 
     long count();
+
+    long countByCep(String cep);
 }

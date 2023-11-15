@@ -1,6 +1,7 @@
 package br.luahr.topicos1.dto;
 
 import br.luahr.topicos1.model.Endereco;
+import br.luahr.topicos1.model.Municipio;
 
 public record EnderecoResponseDTO(
     Long id,
@@ -8,16 +9,16 @@ public record EnderecoResponseDTO(
     String numero,
     String complemento,
     String cep,
-    MunicipioResponseDTO municipio
+    Municipio municipio
 ) {
-    public EnderecoResponseDTO(Endereco endereco) {
-        this(
+    public static EnderecoResponseDTO valueOf (Endereco endereco) {
+        return new EnderecoResponseDTO(
             endereco.getId(),
             endereco.getBairro(),
             endereco.getNumero(),
             endereco.getComplemento(),
             endereco.getCep(),
-            new MunicipioResponseDTO(endereco.getMunicipio())
+            endereco.getMunicipio()
         );
     }
 }

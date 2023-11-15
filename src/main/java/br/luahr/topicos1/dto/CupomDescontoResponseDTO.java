@@ -17,7 +17,8 @@ public record CupomDescontoResponseDTO(
         return new CupomDescontoResponseDTO(
             cupomDesconto.getId(),
             cupomDesconto.getCodigo(),
-            cupomDesconto.getValorDesconto(), cupomDesconto.getValidade(),
+            cupomDesconto.getValorDesconto(), 
+            cupomDesconto.getValidade(),
             cupomDesconto.getCompra()
         );
     }
