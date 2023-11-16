@@ -29,26 +29,23 @@ public class FlorImplService implements FlorService{
     Validator validator;
 
     @Override
-    public List<FlorResponseDTO> getAll() {
-        return  florRepository.findAll()
-                                        .stream()
-                                        .map(FlorResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<FlorResponseDTO> getAll(int page, int pageSize) {
+        List<Flor> list = florRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> FlorResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public FlorResponseDTO findById(Long id) {
         Flor flor = florRepository.findById(id);
-        if (flor == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new FlorResponseDTO(flor);
+        if(flor == null)
+            throw new NotFoundException("Flor não encontrada.");
+        return FlorResponseDTO.valueOf(flor);
     }
 
     @Override
     @Transactional
     public FlorResponseDTO create(FlorDTO florDTO) {
-        validar(florDTO);
+        //validar(florDTO);
 
         Flor entity = new Flor();
 
@@ -63,16 +60,17 @@ public class FlorImplService implements FlorService{
 
         florRepository.persist(entity);
 
-        return new FlorResponseDTO(entity);
+        return FlorResponseDTO.valueOf(entity);
 
     }
 
     @Override
     @Transactional
-    public FlorResponseDTO update(Long id, FlorDTO florDTO) {
+    public FlorResponseDTO update(Long id, FlorDTO florDTO) throws ConstraintViolationException {
         validar(florDTO);
         
         Flor entity = florRepository.findById(id);
+
         entity.setNome(florDTO.nome());
         entity.setDescricao(florDTO.descricao());
         entity.setValorUnidade(florDTO.valorUnidade());
@@ -82,7 +80,7 @@ public class FlorImplService implements FlorService{
         entity.setFornecedor(new Fornecedor());
         entity.getFornecedor().setId(florDTO.idFornecedor());
 
-        return new FlorResponseDTO(entity);
+        return FlorResponseDTO.valueOf(entity);
 
     }
 
@@ -98,38 +96,22 @@ public class FlorImplService implements FlorService{
     @Override
     @Transactional
     public void delete(Long id) throws IllegalArgumentException, NotFoundException{
-        if (id == null){
-            throw new IllegalArgumentException("Número inválido");
-        }
-        Flor flor = florRepository.findById(id);
-
-        if (florRepository.isPersistent(flor)){
-            florRepository.delete(flor);
-        }else
-            throw new NotFoundException("Nenhum usuario encontrado");
-    }
-
-    @Override
-    public List<FlorResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Flor> list = florRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
-
-        return list.stream()
-                    .map(FlorResponseDTO::new)
-                    .collect(Collectors.toList());
+        florRepository.deleteById(id);
     }
 
     @Override
     public long count() {
         return florRepository.count();
     }
+    
+    @Override
+    public List<FlorResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Flor> list = florRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> FlorResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
 
     @Override
-    public Flor updateImg(Long id, String nomeImagem) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateImg'");
+    public long countByNome(String nome) {
+        return florRepository.findByNome(nome).count();
     }
-    
 }

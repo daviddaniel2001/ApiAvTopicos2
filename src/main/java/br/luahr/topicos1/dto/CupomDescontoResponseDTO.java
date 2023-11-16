@@ -7,19 +7,17 @@ import br.luahr.topicos1.model.CupomDesconto;
 
 public record CupomDescontoResponseDTO(
 
-    Long id, 
-    String codigo, 
-    String valorDesconto,
-    LocalDate validade, 
-    Compra compra
-) {
-    public static CupomDescontoResponseDTO valueOf(CupomDesconto cupomDesconto){
+        Long id,
+        String codigo,
+        String valorDesconto,
+        LocalDate validade,
+        Compra compra) {
+    public static CupomDescontoResponseDTO valueOf(CupomDesconto cupomDesconto) {
         return new CupomDescontoResponseDTO(
-            cupomDesconto.getId(),
-            cupomDesconto.getCodigo(),
-            cupomDesconto.getValorDesconto(), 
-            cupomDesconto.getValidade(),
-            cupomDesconto.getCompra()
-        );
+                cupomDesconto.getId(),
+                cupomDesconto.getCodigo(),
+                cupomDesconto.getValorDesconto(),
+                cupomDesconto.getValidade(),
+                cupomDesconto.getCompra());
     }
 }
