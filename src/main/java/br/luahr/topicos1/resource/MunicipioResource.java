@@ -6,16 +6,17 @@ import org.jboss.logging.Logger;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -36,50 +37,41 @@ public class MunicipioResource {
 
     @GET
     @RolesAllowed({"Admin", "User"})
-    public List<MunicipioResponseDTO> getAll() {
+    public List<MunicipioResponseDTO> getAll(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSeize") @DefaultValue("10") int pageSize) {
+                
         LOG.info("Buscando todos os municipios.");
         LOG.debug("Debug de busca de lista de municipios.");
-        return municipioService.getAll();
+        return municipioService.findByNome(null, page, pageSize);
     }
 
     @GET
     @Path("/{id}")
     @RolesAllowed({"Admin", "User"})
     public MunicipioResponseDTO findById(@PathParam("id") Long id) {
-        LOG.info("Buscando um municipio por ID.");
-        LOG.debug("Debug de busca de ID de municipios.");
         return municipioService.findById(id);
     }
 
     @POST
-    @Transactional
     @RolesAllowed({"Admin"})
     public Response insert(MunicipioDTO municipioDTO) {
-        LOG.info("Inserindo um municipio.");
-        try {
-            MunicipioResponseDTO municipio = municipioService.create(municipioDTO);
-            return Response.status(Status.CREATED).entity(municipio).build();
-        } catch(ConstraintViolationException e) {
-            Result result = new Result(e.getConstraintViolations());
-            LOG.debug("Debug de inserção de municipios.");
-            return Response.status(Status.NOT_FOUND).entity(result).build();
-        }
+        LOG.infof("Inserindo um municipio: %s",municipioDTO.nome());
+
+        MunicipioResponseDTO municipio = municipioService.create(municipioDTO);
+        LOG.infof("Municipio (%d) criado com sucesso.", municipio.id());
+        return Response.status(Status.CREATED).entity(municipio).build();
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
     @RolesAllowed({"Admin"})
     public Response update(@PathParam("id") Long id, MunicipioDTO municipioDTO) {
-        LOG.info("Atualiza um municipio.");
         try {
             MunicipioResponseDTO municipio = municipioService.update(id, municipioDTO);
-            return Response.status(Status.NO_CONTENT).entity(municipio).build();
+            return Response.ok(municipio).build();
         } catch(ConstraintViolationException e) {
             Result result = new Result(e.getConstraintViolations());
-            LOG.debug("Debug de updat de municipios.");
             return Response.status(Status.NOT_FOUND).entity(result).build();
         }
     }
@@ -88,9 +80,7 @@ public class MunicipioResource {
     @Path("/{id}")
     @RolesAllowed({"Admin"})
     public Response delete(@PathParam("id") Long id) {
-        LOG.info("deleta um municipio.");
         municipioService.delete(id);
-        LOG.debug("Debug de deletar municipios.");
         return Response.status(Status.NO_CONTENT).build();
     }
 
@@ -98,15 +88,25 @@ public class MunicipioResource {
     @Path("/count")
     @RolesAllowed({"Admin", "User"})
     public long count(){
-        LOG.info("Conta municipios.");
+        return municipioService.count();
+    }
+
+    @GET
+    @Path("/count")
+    @RolesAllowed({"Admin", "User"})
+    public long count(@PathParam("nome")String nome){
         return municipioService.count();
     }
 
     @GET
     @Path("/search/{nome}")
     @RolesAllowed({"Admin", "User"})
-    public List<MunicipioResponseDTO> search(@PathParam("nome") String nome){
-        LOG.info("Busca nome de municipios.");
-        return municipioService.findByNome(nome);
+    public List<MunicipioResponseDTO> search(
+
+            @PathParam("nome") String nome,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+
+        return municipioService.findByNome(nome, page, pageSize);
     }
 }

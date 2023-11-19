@@ -10,12 +10,14 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -36,34 +38,33 @@ public class FornecedorResource {
 
     @GET
     @RolesAllowed({"Admin", "User"})
-    public List<FornecedorResponseDTO> getAll() {
-        LOG.info("Buscando todos os fornecedores.");
-        LOG.debug("Debug de busca de lista de fornecedores.");
-        return fornecedorService.getAll();
+    public List<FornecedorResponseDTO> getAll(
+
+            @QueryParam("page") @DefaultValue("o") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize){
+        
+        LOG.info("Buscando por todas as floriculturas");
+        LOG.debug("ERRO DE DEBUG");
+        return fornecedorService.getAll(page, pageSize);
+
     }
+
 
     @GET
     @Path("/{id}")
     @RolesAllowed({"Admin", "User"})
     public FornecedorResponseDTO findById(@PathParam("id") Long id) {
-        LOG.info("Buscando um fornecedor por ID.");
-        LOG.debug("Debug de busca de ID de fornecedores.");
         return fornecedorService.findById(id);
     }
 
     @POST
-    @Transactional
     @RolesAllowed({"Admin"})
     public Response insert(FornecedorDTO fornecedorDTO) {
-        LOG.info("Inserindo um fornecedor.");
-        try {
-            FornecedorResponseDTO fornecedor = fornecedorService.create(fornecedorDTO);
-            return Response.status(Status.CREATED).entity(fornecedor).build();
-        } catch(ConstraintViolationException e) {
-            Result result = new Result(e.getConstraintViolations());
-            LOG.debug("Debug de inserção de fornecedores.");
-            return Response.status(Status.NOT_FOUND).entity(result).build();
-        }
+        LOG.infof("Inserindo um fornecedor: %s", fornecedorDTO.nome());
+
+        FornecedorResponseDTO fornecedor = fornecedorService.create(fornecedorDTO);
+        LOG.infof("Fornecedor (%d) criado com sucesso.", fornecedor.id());
+        return Response.status(Status.CREATED).entity(fornecedor).build();
     }
 
     @PUT
@@ -76,10 +77,9 @@ public class FornecedorResource {
         LOG.info("Atualiza um fornecedor.");
         try {
             FornecedorResponseDTO fornecedor = fornecedorService.update(id, fornecedorDTO);
-            return Response.status(Status.NO_CONTENT).entity(fornecedor).build();
+            return Response.ok(fornecedor).build();
         } catch(ConstraintViolationException e) {
             Result result = new Result(e.getConstraintViolations());
-            LOG.debug("Debug de updat de fornecedores.");
             return Response.status(Status.NOT_FOUND).entity(result).build();
         }
     }
@@ -88,9 +88,7 @@ public class FornecedorResource {
     @Path("/{id}")
     @RolesAllowed({"Admin"})
     public Response delete(@PathParam("id") Long id) {
-        LOG.info("deleta um fornecedor.");
         fornecedorService.delete(id);
-        LOG.debug("Debug de deletar fornecedores.");
         return Response.status(Status.NO_CONTENT).build();
     }
 
@@ -98,15 +96,22 @@ public class FornecedorResource {
     @Path("/count")
     @RolesAllowed({"Admin", "User"})
     public long count(){
-        LOG.info("Conta fornecedores.");
         return fornecedorService.count();
+    }
+
+    @GET
+    @Path("/search/{nome}/count")
+    public long count(@PathParam("nome") String nome) {
+        return fornecedorService.countByNome(nome);
     }
 
     @GET
     @Path("/search/{nome}")
     @RolesAllowed({"Admin", "User"})
-    public List<FornecedorResponseDTO> search(@PathParam("nome") String nome){
-        LOG.info("Busca nome de fornecedores.");
-        return fornecedorService.findByNome(nome);
+    public List<FornecedorResponseDTO> search(
+            @PathParam("nome") String nome,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+        return fornecedorService.findByNome(nome, page, pageSize);
     }
 }

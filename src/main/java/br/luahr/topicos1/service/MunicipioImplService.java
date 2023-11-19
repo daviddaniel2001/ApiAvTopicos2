@@ -12,10 +12,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
-
 import br.luahr.topicos1.dto.MunicipioDTO;
 import br.luahr.topicos1.dto.MunicipioResponseDTO;
-import br.luahr.topicos1.model.Estado;
 import br.luahr.topicos1.model.Municipio;
 import br.luahr.topicos1.repository.EstadoRepository;
 import br.luahr.topicos1.repository.MunicipioRepository;
@@ -33,36 +31,32 @@ public class MunicipioImplService implements MunicipioService{
     Validator validator;
     
     @Override
-    public List<MunicipioResponseDTO> getAll() {
-        return municipioRepository.findAll()
-                                        .stream()
-                                        .map(MunicipioResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<MunicipioResponseDTO> getAll(int page, int pageSize) {
+        List<Municipio> list = municipioRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> MunicipioResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public MunicipioResponseDTO findById(Long id) {
         Municipio municipio = municipioRepository.findById(id);
-        if (municipio == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new MunicipioResponseDTO(municipio);
+        if(municipio == null)
+            throw new NotFoundException("Municipio não encontrado.");
+        return MunicipioResponseDTO.valueOf(municipio);
     }
 
     @Override
     @Transactional
     public MunicipioResponseDTO create(MunicipioDTO municipioDTO) throws ConstraintViolationException{
-        validar(municipioDTO);
+        //validar(municipioDTO);
 
-        var entity = new Municipio();
-        entity.setNome(municipioDTO.nome());
+        Municipio entity = new Municipio();
         
-        entity.setEstado(new Estado());
-        entity.getEstado().setId(municipioDTO.idEstado());
+        entity.setNome(municipioDTO.nome());
+        entity.setId(municipioDTO.idEstado());
 
         municipioRepository.persist(entity);
 
-        return new MunicipioResponseDTO(entity);
+        return MunicipioResponseDTO.valueOf(entity);
 
     }
 
@@ -71,14 +65,12 @@ public class MunicipioImplService implements MunicipioService{
     public MunicipioResponseDTO update(Long id, MunicipioDTO municipioDTO) throws ConstraintViolationException{
         validar(municipioDTO);
 
-        var entity = municipioRepository.findById(id);
-        entity.setNome(municipioDTO.nome());
-        
-        if(!municipioDTO.idEstado().equals(entity.getEstado().getId()) ){
-        entity.getEstado().setId(municipioDTO.idEstado());;
-        }
+        Municipio entity = municipioRepository.findById(id);
 
-        return new MunicipioResponseDTO(entity);
+        entity.setNome(municipioDTO.nome());
+        entity.setId(municipioDTO.idEstado());
+
+        return MunicipioResponseDTO.valueOf(entity);
     }
 
     private void validar(MunicipioDTO municipioDTO) throws ConstraintViolationException {
@@ -93,32 +85,22 @@ public class MunicipioImplService implements MunicipioService{
     @Override
     @Transactional
     public void delete(Long id) throws IllegalArgumentException, NotFoundException{
-        if (id == null){
-            throw new IllegalArgumentException("Número inválido");
-        }
-        var municipio = municipioRepository.findById(id);
-
-        if (municipioRepository.isPersistent(municipio)){
-            municipioRepository.delete(municipio);
-        }else
-            throw new NotFoundException("Nenhum usuario encontrado");
-    }
-
-    @Override
-    public List<MunicipioResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Municipio> list = municipioRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum município encontrado");
-
-        return list.stream()
-                        .map(MunicipioResponseDTO::new)
-                        .collect(Collectors.toList());
+        municipioRepository.deleteById(id);
     }
 
     @Override
     public long count() {
         return municipioRepository.count();
     }
-    
+
+        @Override
+    public long countByNome(String nome) {
+        return municipioRepository.findByNome(nome).count();
+    }
+
+    @Override
+    public List<MunicipioResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Municipio> list = municipioRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e-> MunicipioResponseDTO.valueOf(e)).collect(Collectors.toList()); 
+    }
 }

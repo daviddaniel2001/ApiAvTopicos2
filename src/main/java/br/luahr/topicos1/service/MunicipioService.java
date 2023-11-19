@@ -4,22 +4,23 @@ import java.util.List;
 
 import br.luahr.topicos1.dto.MunicipioDTO;
 import br.luahr.topicos1.dto.MunicipioResponseDTO;
+import jakarta.validation.Valid;
 
 public interface MunicipioService {
-    // recursos basicos
-    List<MunicipioResponseDTO> getAll();
+    
+    List<MunicipioResponseDTO> getAll(int page, int pageSize);
 
     MunicipioResponseDTO findById(Long id);
 
-    MunicipioResponseDTO create(MunicipioDTO productDTO);
+    MunicipioResponseDTO create(@Valid MunicipioDTO productDTO);
 
     MunicipioResponseDTO update(Long id, MunicipioDTO productDTO);
 
     void delete(Long id);
 
-    // recursos extras
-
-    List<MunicipioResponseDTO> findByNome(String nome);
+    List<MunicipioResponseDTO> findByNome(String nome, int page, int pageSize);
 
     long count();
+
+    long countByNome(String nome);
 }

@@ -11,7 +11,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
-
 import br.luahr.topicos1.dto.FornecedorDTO;
 import br.luahr.topicos1.dto.FornecedorResponseDTO;
 import br.luahr.topicos1.model.Fornecedor;
@@ -27,28 +26,28 @@ public class FornecedorImplService implements FornecedorService{
     Validator validator;
 
     @Override
-    public List<FornecedorResponseDTO> getAll() {
-        return fornecedorRepository.findAll()
-                                        .stream()
-                                        .map(FornecedorResponseDTO::new)
-                                        .collect(Collectors.toList());
-    }
+    public List<FornecedorResponseDTO> getAll(int page, int pageSize) {
+
+        List<Fornecedor> list = fornecedorRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> FornecedorResponseDTO.valueOf(e)).collect(Collectors.toList());
+    } 
 
     @Override
     public FornecedorResponseDTO findById(Long id) {
+
         Fornecedor fornecedor = fornecedorRepository.findById(id);
-        if (fornecedor == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new FornecedorResponseDTO(fornecedor);
+        if (fornecedor == null)
+            throw new NotFoundException("Fornecedor não encontrada.");
+        return FornecedorResponseDTO.valueOf(fornecedor);
     }
 
     @Override
     @Transactional
-    public FornecedorResponseDTO create(FornecedorDTO fornecedorDTO) {
-        validar(fornecedorDTO);
+    public FornecedorResponseDTO create(FornecedorDTO fornecedorDTO) throws ConstraintViolationException {
+        //validar(fornecedorDTO);
 
         Fornecedor entity = new Fornecedor();
+
         entity.setNome(fornecedorDTO.nome());
         entity.setPais(fornecedorDTO.pais());
         entity.setSafra(fornecedorDTO.safra());
@@ -56,21 +55,23 @@ public class FornecedorImplService implements FornecedorService{
 
         fornecedorRepository.persist(entity);
 
-        return new FornecedorResponseDTO(entity);
+        return FornecedorResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
     public FornecedorResponseDTO update(Long id, FornecedorDTO fornecedorDTO) throws ConstraintViolationException{
+
         validar(fornecedorDTO);
 
         Fornecedor entity = fornecedorRepository.findById(id);
+
         entity.setNome(fornecedorDTO.nome());
         entity.setPais(fornecedorDTO.pais());
         entity.setSafra(fornecedorDTO.safra());
         entity.setVolume(fornecedorDTO.volume());
 
-        return new FornecedorResponseDTO(entity);
+        return FornecedorResponseDTO.valueOf(entity);
     }
 
     private void validar(FornecedorDTO fornecedorDTO) throws ConstraintViolationException {
@@ -85,31 +86,22 @@ public class FornecedorImplService implements FornecedorService{
     @Override
     @Transactional
     public void delete(Long id) throws IllegalArgumentException, NotFoundException{
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Fornecedor fornecedor = fornecedorRepository.findById(id);
-
-        if (fornecedorRepository.isPersistent(fornecedor)){
-            fornecedorRepository.delete(fornecedor);
-        }else
-            throw new NotFoundException("Nenhum usuario encontrado");
-    }
-
-    @Override
-    public List<FornecedorResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Fornecedor> list = fornecedorRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
-
-        return list.stream()
-                    .map(FornecedorResponseDTO::new)
-                    .collect(Collectors.toList());
+        fornecedorRepository.deleteById(id);
     }
 
     @Override
     public long count() {
         return fornecedorRepository.count();
+    }
+
+    @Override
+    public List<FornecedorResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Fornecedor> list = fornecedorRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> FornecedorResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByNome(String nome) {
+        return fornecedorRepository.findByNome(nome).count();
     }
 }
