@@ -16,7 +16,7 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
-public class TransportadoraImplService implements TransportadoraService{
+public class TransportadoraImplService implements TransportadoraService {
 
     @Inject
     TransportadoraRepository transportadoraRepository;
@@ -25,24 +25,22 @@ public class TransportadoraImplService implements TransportadoraService{
     Validator validator;
 
     @Override
-    public List<TransportadoraResponseDTO> getAll() {
-        return transportadoraRepository.findAll()
-                .stream()
-                .map(TransportadoraResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<TransportadoraResponseDTO> getAll(int page, int pageSize) {
+        List<Transportadora> list = transportadoraRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> TransportadoraResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public TransportadoraResponseDTO findById(Long id) {
         Transportadora transportadora = transportadoraRepository.findById(id);
-        if(transportadora == null)
-            throw new NotFoundException("Não encontrado.");
-        return new TransportadoraResponseDTO(transportadora);
+        if (transportadora == null)
+            throw new NotFoundException("Transportadora não encontrada.");
+        return TransportadoraResponseDTO.valueOf(transportadora);
     }
 
     @Override
     public TransportadoraResponseDTO create(TransportadoraDTO transportadoraDTO) {
-        validar(transportadoraDTO);
+        // validar(transportadoraDTO);
 
         var entity = new Transportadora();
         entity.setNome(transportadoraDTO.nome());
@@ -53,7 +51,7 @@ public class TransportadoraImplService implements TransportadoraService{
         entity.setTempoEstimado(transportadoraDTO.tempoEstimado());
         entity.setCompra(transportadoraDTO.compra());
 
-        return new TransportadoraResponseDTO(entity);
+        return TransportadoraResponseDTO.valueOf(entity);
     }
 
     @Override
@@ -69,20 +67,20 @@ public class TransportadoraImplService implements TransportadoraService{
         entity.setTempoEstimado(transportadoraDTO.tempoEstimado());
         entity.setCompra(transportadoraDTO.compra());
 
-        return new TransportadoraResponseDTO(entity);
+        return TransportadoraResponseDTO.valueOf(entity);
+    }
+
+    private void validar(TransportadoraDTO transportadoraDTO) throws ConstraintViolationException {
+
+        Set<ConstraintViolation<TransportadoraDTO>> violations = validator.validate(transportadoraDTO);
+
+        if (!violations.isEmpty())
+            throw new ConstraintViolationException(violations);
     }
 
     @Override
     public void delete(Long id) {
-        if(id == null)
-            throw new IllegalArgumentException("Numero invalido.");
-        
-        Transportadora transportadora = transportadoraRepository.findById(id);
-
-        if(transportadoraRepository.isPersistent(transportadora)) {
-            transportadoraRepository.delete(transportadora);
-        } else 
-             throw new NotFoundException("Nenhuma transportadora encontrada.");
+        transportadoraRepository.deleteById(id);
     }
 
     @Override
@@ -90,13 +88,13 @@ public class TransportadoraImplService implements TransportadoraService{
         return transportadoraRepository.count();
     }
 
-    private void validar(TransportadoraDTO transportadoraDTO) throws ConstraintViolationException {
-        
-        Set<ConstraintViolation<TransportadoraDTO>> violations = validator.validate(transportadoraDTO);
-
-        if(!violations.isEmpty())
-            throw new ConstraintViolationException(violations);
+    public long countByNome(String nome) {
+        return transportadoraRepository.findByNome(nome).count();
     }
 
-    
+    @Override
+    public List<TransportadoraResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Transportadora> list = transportadoraRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> TransportadoraResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
 }

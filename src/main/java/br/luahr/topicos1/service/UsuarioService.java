@@ -5,14 +5,15 @@ import java.util.List;
 import br.luahr.topicos1.dto.UsuarioDTO;
 import br.luahr.topicos1.dto.UsuarioResponseDTO;
 import br.luahr.topicos1.model.Usuario;
+import jakarta.validation.Valid;
 
 public interface UsuarioService {
-    // recursos basicos
-    List<UsuarioResponseDTO> getAll();
+    
+    List<UsuarioResponseDTO> getAll(int page, int pageSize);
 
     UsuarioResponseDTO findById(Long id);
 
-    UsuarioResponseDTO create(UsuarioDTO productDTO);
+    UsuarioResponseDTO create(@Valid UsuarioDTO productDTO);
 
     UsuarioResponseDTO update(Long id, UsuarioDTO productDTO);
 
@@ -24,9 +25,9 @@ public interface UsuarioService {
 
     void delete(Long id);
 
-    // recursos extras
-
-    List<UsuarioResponseDTO> findByNome(String nome);
+    List<UsuarioResponseDTO> findByNome(String nome, int page, int pageSize);
 
     long count();
+
+    long countByNome(String nome);
 }

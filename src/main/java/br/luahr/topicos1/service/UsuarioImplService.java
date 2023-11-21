@@ -44,25 +44,23 @@ public class UsuarioImplService implements UsuarioService {
     HashServiceImpl hashServiceImpl;
 
     @Override
-    public List<UsuarioResponseDTO> getAll() {
-        return usuarioRepository.findAll()
-                .stream()
-                .map(UsuarioResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<UsuarioResponseDTO> getAll(int page, int pageSize) {
+        List<Usuario> list = usuarioRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> UsuarioResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public UsuarioResponseDTO findById(Long id) {
         Usuario usuario = usuarioRepository.findById(id);
         if (usuario == null)
-            throw new NotFoundException("Não encontrado");
-        return new UsuarioResponseDTO(usuario);
+            throw new NotFoundException("Usuario não encontrado.");
+        return UsuarioResponseDTO.valueOf(usuario);
     }
 
     @Override
     @Transactional
     public UsuarioResponseDTO create(UsuarioDTO usuarioDTO) throws ConstraintViolationException {
-        validar(usuarioDTO);
+        //validar(usuarioDTO);
 
         var entity = new Usuario();
         entity.setNome(usuarioDTO.nome());
@@ -85,7 +83,7 @@ public class UsuarioImplService implements UsuarioService {
 
         usuarioRepository.persist(entity);
 
-        return new UsuarioResponseDTO(entity);
+        return UsuarioResponseDTO.valueOf(entity);
     }
 
     @Override
@@ -109,38 +107,13 @@ public class UsuarioImplService implements UsuarioService {
             entity.getEndereco().setId(usuarioDTO.idEndereco());
         }
 
-        return new UsuarioResponseDTO(entity);
+        return UsuarioResponseDTO.valueOf(entity);
     }
 
     @Override
     @Transactional
     public void delete(Long id) throws IllegalArgumentException, NotFoundException {
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Usuario usuario = usuarioRepository.findById(id);
-
-        if (usuarioRepository.isPersistent(usuario)) {
-            usuarioRepository.delete(usuario);
-        } else
-            throw new NotFoundException("Nenhum usuario encontrado");
-    }
-
-    @Override
-    public List<UsuarioResponseDTO> findByNome(String nome) throws NotFoundException {
-        List<Usuario> list = usuarioRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
-
-        return list.stream()
-                .map(UsuarioResponseDTO::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public long count() {
-        return usuarioRepository.count();
+        usuarioRepository.deleteById(id);
     }
 
     @Override
@@ -153,7 +126,7 @@ public class UsuarioImplService implements UsuarioService {
         Usuario usuario = usuarioRepository.findByLogin(login);
         if (usuario == null)
             throw new NotFoundException("Cliente não encontrado");
-        return new UsuarioResponseDTO(usuario);
+        return UsuarioResponseDTO.valueOf(usuario);
     }
 
     @Override
@@ -163,7 +136,7 @@ public class UsuarioImplService implements UsuarioService {
 
         usuario.setNomeImagem(nomeImagem);
 
-        return new UsuarioResponseDTO(usuario);
+        return UsuarioResponseDTO.valueOf(usuario);
     }
 
     // validações
@@ -173,5 +146,21 @@ public class UsuarioImplService implements UsuarioService {
 
         if (!violations.isEmpty())
             throw new ConstraintViolationException(violations);
+    }
+
+    @Override
+    public long count() {
+        return usuarioRepository.count();
+    }
+
+    @Override
+    public long countByNome(String nome) {
+        return usuarioRepository.findByNome(nome).count();
+    }
+
+        @Override
+    public List<UsuarioResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Usuario> list = usuarioRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> UsuarioResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 }
