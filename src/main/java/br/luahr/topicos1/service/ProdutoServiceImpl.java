@@ -26,11 +26,9 @@ public class ProdutoServiceImpl implements ProdutoService {
     Validator validator;
 
     @Override
-    public List<ProdutoResponseDTO> getAll() {
-        return produtoRepository.findAll()
-                .stream()
-                .map(ProdutoResponseDTO::new)
-                .collect(Collectors.toList());
+    public List<ProdutoResponseDTO> getAll(int page, int pageSize) {
+        List<Produto> list = produtoRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> ProdutoResponseDTO.valueOf(e)).collect(Collectors.toList());
 
     }
 
@@ -38,8 +36,8 @@ public class ProdutoServiceImpl implements ProdutoService {
     public ProdutoResponseDTO findById(Long id) {
         Produto produto = produtoRepository.findById(id);
         if (produto == null)
-            throw new NotFoundException("Não encontrado.");
-        return new ProdutoResponseDTO(produto);
+            throw new NotFoundException("Produto não encontrado.");
+        return ProdutoResponseDTO.valueOf(produto);
     }
 
     @Override
@@ -55,7 +53,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 
         produtoRepository.persist(entity);
 
-        return new ProdutoResponseDTO(entity);
+        return ProdutoResponseDTO.valueOf(entity);
     }
 
     @Override
@@ -70,26 +68,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         entity.setNomeImagem(produtoDTO.nomeImagem());
         entity.setQuantEstoque(produtoDTO.quantEstoque());
 
-        return new ProdutoResponseDTO(entity);
-    }
-
-    @Override
-    public void delete(Long id) {
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Produto produto = produtoRepository.findById(id);
-
-        if (produtoRepository.isPersistent(produto)) {
-            produtoRepository.delete(produto);
-        } else
-            throw new NotFoundException("Nenhuma floricultura encontrada.");
-
-    }
-
-    @Override
-    public long count() {
-        return produtoRepository.count();
+        return ProdutoResponseDTO.valueOf(entity);
     }
 
     private void validar(ProdutoDTO produtoDTO) throws ConstraintViolationException {
@@ -99,6 +78,27 @@ public class ProdutoServiceImpl implements ProdutoService {
         if (!violations.isEmpty())
             throw new ConstraintViolationException(violations);
 
+    }
+
+    @Override
+    public void delete(Long id) {
+        produtoRepository.deleteById(id);
+    }
+
+    @Override
+    public long count() {
+        return produtoRepository.count();
+    }
+
+    @Override
+    public List<ProdutoResponseDTO> findByNome(String nome, int page, int pageSize) {
+        List<Produto> list = produtoRepository.findByNome(nome).page(page, pageSize).list();
+        return list.stream().map(e -> ProdutoResponseDTO.valueOf(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByNome(String nome) {
+        return produtoRepository.findByNome(nome).count();
     }
 
 }

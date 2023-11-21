@@ -11,7 +11,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
-
 import br.luahr.topicos1.dto.TelefoneDTO;
 import br.luahr.topicos1.dto.TelefoneResponseDTO;
 import br.luahr.topicos1.model.Telefone;
@@ -27,26 +26,23 @@ public class TelefoneImplService implements TelefoneService{
     Validator validator;
     
     @Override
-    public List<TelefoneResponseDTO> getAll() {
-        return telefoneRepository.findAll()
-                                        .stream()
-                                        .map(TelefoneResponseDTO::new)
-                                        .collect(Collectors.toList());
+    public List<TelefoneResponseDTO> getAll(int page, int pageSize) {
+        List<Telefone> list = telefoneRepository.findAll().page(page, pageSize).list();
+        return list.stream().map(e -> TelefoneResponseDTO.valueOf(e)).collect(Collectors.toList());
     }
 
     @Override
     public TelefoneResponseDTO findById(Long id) {
         Telefone telefone = telefoneRepository.findById(id);
-        if (telefone == null){
-            throw new NotFoundException("Não encontrado");
-        }
-        return new TelefoneResponseDTO(telefone);
+        if(telefone == null)
+            throw new NotFoundException("Telefone não encontrado.");
+        return TelefoneResponseDTO.valueOf(telefone);
     }
 
     @Override
     @Transactional
     public TelefoneResponseDTO create(TelefoneDTO telefoneDTO) throws ConstraintViolationException{
-        validar(telefoneDTO);
+        //validar(telefoneDTO);
 
         Telefone entity = new Telefone();
         entity.setCodigoArea(telefoneDTO.codigoArea());
@@ -54,7 +50,7 @@ public class TelefoneImplService implements TelefoneService{
 
         telefoneRepository.persist(entity);
 
-        return new TelefoneResponseDTO(entity);
+        return TelefoneResponseDTO.valueOf(entity);
     }
 
     @Override
@@ -66,7 +62,7 @@ public class TelefoneImplService implements TelefoneService{
         entity.setCodigoArea(telefoneDTO.codigoArea());
         entity.setNumero(telefoneDTO.numero());
 
-        return new TelefoneResponseDTO(entity);
+        return TelefoneResponseDTO.valueOf(entity);
     }
 
     private void validar(TelefoneDTO telefoneDTO) throws ConstraintViolationException {
@@ -81,32 +77,22 @@ public class TelefoneImplService implements TelefoneService{
     @Override
     @Transactional
     public void delete(Long id) throws IllegalArgumentException, NotFoundException{
-        if (id == null)
-            throw new IllegalArgumentException("Número inválido");
-
-        Telefone telefone = telefoneRepository.findById(id);
-
-        if (telefoneRepository.isPersistent(telefone)){
-            telefoneRepository.delete(telefone);
-        }else
-            throw new NotFoundException("Nenhum usuario encontrado");
-    }
-
-    @Override
-    public List<TelefoneResponseDTO> findByNome(String nome) throws NotFoundException{
-        List<Telefone> list = telefoneRepository.findByNome(nome);
-
-        if (list == null)
-            throw new NotFoundException("nenhum usuario encontrado");
-
-        return list.stream()
-                    .map(TelefoneResponseDTO::new)
-                    .collect(Collectors.toList());
+        telefoneRepository.deleteById(id);
     }
 
     @Override
     public long count() {
         return telefoneRepository.count();
     }
-    
+
+    @Override
+    public long countByNumero(String numero) {
+        return telefoneRepository.findByNumero(numero).count();
+    }
+
+    @Override
+    public List<TelefoneResponseDTO> findByNumero(String numero, int page, int pageSize) {
+        List<Telefone> list = telefoneRepository.findByNumero(numero).page(page, pageSize).list();
+        return list.stream().map(e-> TelefoneResponseDTO.valueOf(e)).collect(Collectors.toList()); 
+    }
 }

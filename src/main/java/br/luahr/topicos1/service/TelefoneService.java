@@ -4,22 +4,22 @@ import java.util.List;
 
 import br.luahr.topicos1.dto.TelefoneDTO;
 import br.luahr.topicos1.dto.TelefoneResponseDTO;
+import jakarta.validation.Valid;
 
 public interface TelefoneService {
-    // recursos basicos
-    List<TelefoneResponseDTO> getAll();
+    List<TelefoneResponseDTO> getAll(int page, int pageSize);
 
     TelefoneResponseDTO findById(Long id);
 
-    TelefoneResponseDTO create(TelefoneDTO productDTO);
+    TelefoneResponseDTO create(@Valid TelefoneDTO productDTO);
 
     TelefoneResponseDTO update(Long id, TelefoneDTO productDTO);
 
     void delete(Long id);
 
-    // recursos extras
-
-    List<TelefoneResponseDTO> findByNome(String nome);
+    List<TelefoneResponseDTO> findByNumero(String numero, int page, int pageSize);
 
     long count();
+
+    long countByNumero(String numero);
 }
