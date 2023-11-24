@@ -1,8 +1,10 @@
 package br.luahr.topicos1.resource;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -10,6 +12,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -18,12 +21,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.DefaultValue;
 
 import br.luahr.topicos1.application.Result;
 import br.luahr.topicos1.dto.FlorDTO;
 import br.luahr.topicos1.dto.FlorResponseDTO;
+import br.luahr.topicos1.form.FlorImageForm;
 import br.luahr.topicos1.repository.FlorRepository;
 import br.luahr.topicos1.service.FileService;
 import br.luahr.topicos1.service.FlorService;
@@ -108,7 +113,31 @@ public class FlorResource {
         @QueryParam("page") @DefaultValue("0") int page,
         @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
     return florService.findByNome(nome, page, pageSize);
+    }
+
+    @GET
+    @Path("/image/download/{nomeImagem}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response download(@PathParam("nomeImagem") String nomeImagem) {
+        ResponseBuilder response = Response.ok(fileService.download(nomeImagem));
+        response.header("Content-Disposition", "attachment;filename=" + nomeImagem);
+        return response.build();
+    }
+
+    @PATCH
+    @Path("/image/upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response salvarImagem(@MultipartForm FlorImageForm form) {
+
+        try {
+            fileService.salvar(form.getId(), form.getNomeImagem(), form.getImagem());
+            return Response.noContent().build();
+        } catch (IOException e) {
+            Result result = new Result(e.getMessage());
+            return Response.status(Status.CONFLICT).entity(result).build();
         }
+
+    }
 
 }
 

@@ -114,4 +114,13 @@ public class FlorImplService implements FlorService{
     public long countByNome(String nome) {
         return florRepository.findByNome(nome).count();
     }
+
+    @Override
+    public FlorResponseDTO saveImage(Long id, String nomeImagem) {
+
+        Flor entity = florRepository.findById(id);
+        entity.setNomeImagem(nomeImagem);
+
+        return FlorResponseDTO.valueOf(entity);
+    }
 }

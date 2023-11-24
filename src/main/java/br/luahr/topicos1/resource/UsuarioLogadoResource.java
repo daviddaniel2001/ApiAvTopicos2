@@ -7,7 +7,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import br.luahr.topicos1.application.Result;
 import br.luahr.topicos1.dto.UsuarioResponseDTO;
-import br.luahr.topicos1.form.ImageForm;
+import br.luahr.topicos1.form.FlorImageForm;
 import br.luahr.topicos1.service.UsuarioService;
 import br.luahr.topicos1.service.FileService;
 import jakarta.annotation.security.RolesAllowed;
@@ -46,15 +46,15 @@ public class UsuarioLogadoResource {
         return Response.ok(usuarioResponseDTO).build();
     }
 
-    @PATCH
+ /*    @PATCH
     @Path("/novaimagem")
     @RolesAllowed({ "Admin", "User" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response salvarImagem(@MultipartForm ImageForm form) {
+    public Response salvarImagem(@MultipartForm FlorImageForm form) {
         String nomeImagem = "";
 
         try {
-            nomeImagem = fileService.salvarImagemUsuario(form.getImagem(), form.getNomeImagem());
+            nomeImagem = fileService.nomeImagem(form.getImagem(), form.getNomeImagem());
         } catch (IOException e) {
             Result result = new Result(e.getMessage());
             return Response.status(Status.CONFLICT).entity(result).build();
@@ -66,7 +66,7 @@ public class UsuarioLogadoResource {
         cliente = usuarioService.update(cliente.id(), nomeImagem);
 
         return Response.ok(cliente).build();
-    }
+    } */
 
     @GET
     @Path("/download/{nomeImagem}")

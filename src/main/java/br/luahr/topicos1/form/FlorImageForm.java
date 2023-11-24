@@ -4,7 +4,10 @@ import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 import jakarta.ws.rs.FormParam;
 
-public class ImageForm {
+public class FlorImageForm {
+
+    @FormParam("id")
+    private Long id;
 
     @FormParam("nomeImagem")
     private String nomeImagem;
@@ -12,6 +15,14 @@ public class ImageForm {
     @FormParam("imagem")
     @PartType("application/octet-stream")
     private byte[] imagem;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNomeImagem() {
         return nomeImagem;
