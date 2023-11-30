@@ -1,27 +1,27 @@
 package br.luahr.topicos1.resource;
 
-import java.io.IOException;
+//import java.io.IOException;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+//import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import br.luahr.topicos1.application.Result;
+//import br.luahr.topicos1.application.Result;
 import br.luahr.topicos1.dto.UsuarioResponseDTO;
-import br.luahr.topicos1.form.FlorImageForm;
+//import br.luahr.topicos1.form.FlorImageForm;
 import br.luahr.topicos1.service.UsuarioService;
 import br.luahr.topicos1.service.FileService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
+//import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
-import jakarta.ws.rs.core.Response.Status;
+//import jakarta.ws.rs.core.Response.Status;
 
 @Path("/usuariologado")
 @Consumes(MediaType.APPLICATION_JSON)
