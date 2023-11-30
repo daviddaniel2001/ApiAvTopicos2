@@ -20,7 +20,7 @@ import br.luahr.topicos1.repository.CompraRepository;
 import br.luahr.topicos1.repository.FlorRepository;
 
 @ApplicationScoped
-public class CompraImplService implements CompraService {
+public class CompraServiceImpl implements CompraService {
 
     @Inject
     CompraRepository compraRepository;

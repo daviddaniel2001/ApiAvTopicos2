@@ -16,7 +16,7 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
-public class TransportadoraImplService implements TransportadoraService {
+public class TransportadoraServiceImpl implements TransportadoraService {
 
     @Inject
     TransportadoraRepository transportadoraRepository;

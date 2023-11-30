@@ -19,7 +19,7 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
-public class CupomDescontoImplService implements CupomDescontoService {
+public class CupomDescontoServiceimpl implements CupomDescontoService {
 
     @Inject
     CupomDescontoRepository cupomDescontoRepository;

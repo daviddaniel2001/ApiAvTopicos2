@@ -19,7 +19,7 @@ import br.luahr.topicos1.model.Estado;
 import br.luahr.topicos1.repository.EstadoRepository;
 
 @ApplicationScoped
-public class EstadoImplService implements EstadoService {
+public class EstadoServiceImpl implements EstadoService {
 
     @Inject
     EstadoRepository estadoRepository;

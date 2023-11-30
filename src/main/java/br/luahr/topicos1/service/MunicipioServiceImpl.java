@@ -19,7 +19,7 @@ import br.luahr.topicos1.repository.EstadoRepository;
 import br.luahr.topicos1.repository.MunicipioRepository;
 
 @ApplicationScoped
-public class MunicipioImplService implements MunicipioService{
+public class MunicipioServiceImpl implements MunicipioService{
 
     @Inject
     MunicipioRepository municipioRepository;

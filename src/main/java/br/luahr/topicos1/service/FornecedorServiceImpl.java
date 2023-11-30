@@ -17,7 +17,7 @@ import br.luahr.topicos1.model.Fornecedor;
 import br.luahr.topicos1.repository.FornecedorRepository;
 
 @ApplicationScoped
-public class FornecedorImplService implements FornecedorService{
+public class FornecedorServiceImpl implements FornecedorService{
 
     @Inject
     FornecedorRepository fornecedorRepository;

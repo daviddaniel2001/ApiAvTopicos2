@@ -17,7 +17,7 @@ import br.luahr.topicos1.model.Telefone;
 import br.luahr.topicos1.repository.TelefoneRepository;
 
 @ApplicationScoped
-public class TelefoneImplService implements TelefoneService{
+public class TelefoneServiceImpl implements TelefoneService{
 
     @Inject
     TelefoneRepository telefoneRepository;

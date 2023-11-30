@@ -20,7 +20,7 @@ import br.luahr.topicos1.model.TipoFlor;
 import br.luahr.topicos1.repository.FlorRepository;
 
 @ApplicationScoped
-public class FlorImplService implements FlorService{
+public class FlorServiceImpl implements FlorService{
 
     @Inject
     FlorRepository florRepository;

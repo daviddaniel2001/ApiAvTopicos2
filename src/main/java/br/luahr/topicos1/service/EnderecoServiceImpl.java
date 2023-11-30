@@ -18,7 +18,7 @@ import br.luahr.topicos1.repository.EnderecoRepository;
 import br.luahr.topicos1.repository.MunicipioRepository;
 
 @ApplicationScoped
-public class EnderecoImplService implements EnderecoService {
+public class EnderecoServiceImpl implements EnderecoService {
     @Inject
     EnderecoRepository enderecoRepository;
 

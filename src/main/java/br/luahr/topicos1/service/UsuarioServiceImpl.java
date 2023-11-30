@@ -23,7 +23,7 @@ import br.luahr.topicos1.repository.MunicipioRepository;
 import br.luahr.topicos1.repository.TelefoneRepository;
 
 @ApplicationScoped
-public class UsuarioImplService implements UsuarioService {
+public class UsuarioServiceImpl implements UsuarioService {
 
     @Inject
     UsuarioRepository usuarioRepository;
