@@ -168,7 +168,7 @@ public class FlorServiceImpl implements FlorService{
           .setBold()
           .setFont(font));
 
-      document.add(new Paragraph("Detalhes dos Equipamentos")
+      document.add(new Paragraph("Detalhes das flores")
           .setFontSize(14)
           .setItalic()
           .setFont(font));

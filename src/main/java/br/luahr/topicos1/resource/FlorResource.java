@@ -139,5 +139,17 @@ public class FlorResource {
 
     }
 
+    @GET
+    @Path("/relatorios")
+    @Produces("application/pdf")
+    public Response gerarRelatorioPDF(@QueryParam("nome") @DefaultValue("") String nome) {
+        byte[] pdf = florService.createReportFlor(nome);
+
+        ResponseBuilder responseBuilder = Response.ok(pdf);
+        responseBuilder.header("Content-Disposition", "attachment;filename=relatorio.pdf");
+
+        return responseBuilder.build();
+    }
+
 }
 
