@@ -1,8 +1,30 @@
 package br.luahr.topicos1.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.events.Event;
+import com.itextpdf.kernel.events.IEventHandler;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.UnitValue;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -123,4 +145,89 @@ public class FlorServiceImpl implements FlorService{
 
         return FlorResponseDTO.valueOf(entity);
     }
+
+    @Override
+    public byte[] createReportFlor(String filter) {
+        List<Flor> lista = florRepository.findByNome(filter).list();
+        return gerarRelatorioPDF(lista);
+    }
+
+    public static byte[] gerarRelatorioPDF(List<Flor> florList) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    try (PdfDocument pdfDocument = new PdfDocument(new PdfWriter(baos))) {
+      Document document = new Document(pdfDocument);
+      pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, new HeaderFooterHandler());
+
+      PdfFont font = PdfFontFactory.createFont(StandardFonts.COURIER);
+
+      float tamanhoFonte = 10f;
+
+      document.add(new Paragraph("Relatório de Flor")
+          .setFontSize(16)
+          .setBold()
+          .setFont(font));
+
+      document.add(new Paragraph("Detalhes dos Equipamentos")
+          .setFontSize(14)
+          .setItalic()
+          .setFont(font));
+
+      SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+      String dataHora = sdf.format(new Date());
+      document.add(new Paragraph("Data e Hora de Geração: " + dataHora).setFontSize(12).setFont(font));
+
+      Table table = new Table(UnitValue.createPercentArray(new float[] { 1, 2, 1 })).useAllAvailableWidth();
+      table.addHeaderCell(new Cell().add(new Paragraph("ID")
+          .setFontSize(tamanhoFonte)
+          .setFont(font)));
+      table.addHeaderCell(new Cell().add(new Paragraph("Nome")
+          .setFontSize(tamanhoFonte)
+          .setFont(font)));
+      table.addHeaderCell(new Cell().add(new Paragraph("Preço")
+          .setFontSize(tamanhoFonte)
+          .setFont(font)));
+
+      for (Flor flor : florList) {
+        table.addCell(new Cell().add(new Paragraph(String.valueOf(flor.getId()))
+            .setFontSize(tamanhoFonte)
+            .setFont(font)));
+        table.addCell(
+            new Cell().add(new Paragraph(flor.getNome())
+                .setFontSize(tamanhoFonte)
+                .setFont(font)));
+        table.addCell(new Cell()
+            .add(new Paragraph("R$" + flor.getValorUnidade())
+                .setFontSize(tamanhoFonte)
+                .setFont(font)));
+      }
+
+      document.add(table);
+
+      document.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return baos.toByteArray();
+  }
+}
+
+class HeaderFooterHandler implements IEventHandler {
+  public void handleEvent(Event event) {
+    PdfDocumentEvent docEvent = (PdfDocumentEvent) event;
+    PdfDocument pdf = docEvent.getDocument();
+    PdfPage page = docEvent.getPage();
+    int pageNum = pdf.getPageNumber(page);
+
+    PdfCanvas canvas = new PdfCanvas(page.newContentStreamBefore(), page.getResources(), pdf);
+    canvas.beginText().setFontAndSize(pdf.getDefaultFont(), 12);
+
+    canvas.moveText(34, 20).showText("Página " + pageNum);
+
+    String dataHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy - hh:mm:ss"));
+    canvas.moveText(500 - 80, 0).showText(dataHora);
+
+    canvas.endText();
+  }
 }

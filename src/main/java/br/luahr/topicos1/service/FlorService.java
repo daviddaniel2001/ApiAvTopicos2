@@ -20,6 +20,8 @@ public interface FlorService {
     void delete(Long id);
 
     List<FlorResponseDTO> findByNome(String nome, int page, int pageSize);
+    
+    public byte[] createReportFlor(String filter);
 
     long count();
 
