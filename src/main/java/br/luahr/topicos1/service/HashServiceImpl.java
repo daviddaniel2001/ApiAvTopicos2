@@ -21,8 +21,20 @@ public class HashServiceImpl implements HashService {
         try {
             byte[] result = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
                     .generateSecret(
-                            new PBEKeySpec(senha.toCharArray(), salt.getBytes(), iterationCount, keyLength)
-                        )
+                            new PBEKeySpec(senha.toCharArray(), salt.getBytes(), iterationCount, keyLength))
+                    .getEncoded();
+            return Base64.getEncoder().encodeToString(result);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String getHashLogin(String login) {
+        try {
+            byte[] result = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512")
+                    .generateSecret(
+                            new PBEKeySpec(login.toCharArray(), salt.getBytes(), iterationCount, keyLength))
                     .getEncoded();
             return Base64.getEncoder().encodeToString(result);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -32,8 +44,8 @@ public class HashServiceImpl implements HashService {
 
     public static void main(String[] args) {
         HashService service = new HashServiceImpl();
-        System.out.println();
+        System.out.println(service.getHashLogin("janio"));
         System.out.println(service.getHashSenha("123"));
     }
-    
+
 }
