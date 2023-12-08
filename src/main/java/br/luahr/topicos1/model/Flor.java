@@ -19,6 +19,8 @@ public class Flor extends Produto{
     @JoinColumn(name = "id_fornecedor")
     private Fornecedor fornecedor;
 
+    private Integer estoque;
+
     public String getCorPetalas() {
         return corPetalas;
     }
@@ -58,5 +60,14 @@ public class Flor extends Produto{
     public void setNomeImagem(String nomeImagem) {
         this.nomeImagem = nomeImagem;
     }
+
+    public Integer getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(Integer estoque) {
+        this.estoque = estoque;
+    }
+    
 
 }

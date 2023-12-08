@@ -2,7 +2,11 @@ package br.luahr.topicos1.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -13,7 +17,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 @Entity
-public class Usuario extends DefaultEntity{
+public class Usuario extends DefaultEntity {
 
     @Column(length = 60)
     private String nome;
@@ -24,9 +28,9 @@ public class Usuario extends DefaultEntity{
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_telefone", unique = true)
-    private Telefone telefone;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(name = "usuario_telefone", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_telefone"))
+    private List<Telefone> listaTelefone;
 
     @OneToOne()
     @JoinColumn(name = "id_endereco", unique = true)
@@ -91,14 +95,6 @@ public class Usuario extends DefaultEntity{
         this.sexo = sexo;
     }
 
-    public Telefone getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(Telefone telefone) {
-        this.telefone = telefone;
-    }
-
     public Endereco getEndereco() {
         return endereco;
     }
@@ -114,5 +110,13 @@ public class Usuario extends DefaultEntity{
     public void setPerfis(Set<Perfil> perfis) {
         this.perfis = perfis;
     }
-    
+
+    public List<Telefone> getListaTelefone() {
+        return listaTelefone;
+    }
+
+    public void setListaTelefone(List<Telefone> listaTelefone) {
+        this.listaTelefone = listaTelefone;
+    }
+
 }

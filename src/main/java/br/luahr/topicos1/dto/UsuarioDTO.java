@@ -1,5 +1,7 @@
 package br.luahr.topicos1.dto;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,9 +26,8 @@ public record UsuarioDTO(
 
     Integer idSexo,
 
-    @Valid
     @NotNull(message = "O telefone precisa ser informado.")
-    Long idTelefone,
+    List<TelefoneDTO> listaTelefone,
 
     @Valid
     @NotNull(message = "O endereço precisa ser informado.")

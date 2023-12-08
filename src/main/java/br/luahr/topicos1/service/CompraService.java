@@ -16,9 +16,9 @@ public interface CompraService {
 
     void delete(Long id);
 
-    List<CompraResponseDTO> findByItemProduto(Integer itemProduto, int page, int pageSize);
+    List<CompraResponseDTO> findByItemFlor(Long itemProduto, int page, int pageSize);
 
     long count();
 
-    long countByItemProduto(Integer itemProduto);
+    long countByItemFlor(Long itemFlor);
 }

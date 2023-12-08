@@ -13,7 +13,8 @@ public record FlorResponseDTO(
         Float alturaCaule,
         TipoFlor tipoFlor,
         Fornecedor fornecedor,
-        String nomeImagem) {
+        String nomeImagem,
+        Integer estoque) {
     public static FlorResponseDTO valueOf(Flor flor) {
         return new FlorResponseDTO(
                 flor.getId(),
@@ -24,6 +25,7 @@ public record FlorResponseDTO(
                 flor.getAlturaCaule(),
                 flor.getTipoFlor(),
                 flor.getFornecedor(),
-                flor.getNomeImagem());
+                flor.getNomeImagem(),
+                flor.getEstoque());
     }
 }

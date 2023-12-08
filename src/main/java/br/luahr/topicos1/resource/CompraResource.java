@@ -57,7 +57,7 @@ public class CompraResource {
     @POST
     @RolesAllowed({"Admin"})
     public Response insert(CompraDTO compraDTO) {
-        LOG.infof("Inserindo uma compra: %s", compraDTO.itemProduto());
+        LOG.infof("Inserindo uma compra: %s", compraDTO.itemFlor());
 
         CompraResponseDTO compra = compraService.create(compraDTO);
         LOG.infof("Compra (%id) feita com sucesso.", compra.id());
@@ -97,18 +97,18 @@ public class CompraResource {
     @GET
     @Path("/count")
     @RolesAllowed({"Admin", "User"})
-    public long count(@PathParam("itemProduto") Integer itemProduto){
-        return compraService.countByItemProduto(itemProduto);
+    public long count(@PathParam("itemFlor") Long itemFlor){
+        return compraService.countByItemFlor(itemFlor);
     }
 
     @GET
     @Path("/search/{nome}")
     @RolesAllowed({"Admin", "User"})
     public List<CompraResponseDTO> search(
-            @PathParam("itemProduto") Integer itemProduto,
+            @PathParam("itemProduto") Long itemProduto,
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize){
-        return compraService.findByItemProduto(itemProduto, page, pageSize);
+        return compraService.findByItemFlor(itemProduto, page, pageSize);
 
     }
     

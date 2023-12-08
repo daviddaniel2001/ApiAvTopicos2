@@ -1,9 +1,8 @@
 package br.luahr.topicos1.resource;
 
-import br.luahr.topicos1.model.Usuario;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import br.luahr.topicos1.dto.AuthUsuarioDTO;
+import br.luahr.topicos1.dto.UsuarioResponseDTO;
 import br.luahr.topicos1.service.UsuarioService;
 import br.luahr.topicos1.service.HashService;
 import br.luahr.topicos1.service.TokenJwtService;
@@ -30,22 +29,20 @@ public class AuthResource {
     @Inject
     TokenJwtService tokenService;
 
-    @Inject
-    JsonWebToken jwt;
-
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
     public Response login(AuthUsuarioDTO authDTO) {
         String hash = hashService.getHashSenha(authDTO.senha());
 
-        Usuario usuario = usuarioService.findByLoginAndSenha(authDTO.login(), hash);
+        UsuarioResponseDTO usuario = usuarioService.findByLoginSenha(authDTO.login(), hash);
 
         if (usuario == null) {
-            return Response.status(Status.NO_CONTENT)
+            return Response.status(Status.NOT_FOUND)
                 .entity("Usuario não encontrado").build();
         } 
-        return Response.ok()
+        return Response.ok(usuario)
             .header("Authorization", tokenService.generateJwt(usuario))
             .build();
+        
     }
+  
 }

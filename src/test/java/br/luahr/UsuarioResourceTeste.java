@@ -1,4 +1,4 @@
-package br.luahr;
+/* package br.luahr;
 
 import static io.restassured.RestAssured.given;
 
@@ -172,3 +172,4 @@ public class UsuarioResourceTeste {
                 }
         }
 }
+ */

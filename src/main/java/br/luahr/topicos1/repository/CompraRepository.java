@@ -8,8 +8,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class CompraRepository implements PanacheRepository<Compra> {
 
-    public PanacheQuery<Compra> findByItemProduto(Integer itemProduto) {
-        if(itemProduto == null)
+    public PanacheQuery<Compra> findByItemFlor(Long itemFlor) {
+        if(itemFlor == null)
             return null;
         return find("UPPER(itemProduto) LIKE ?1 ");
     }

@@ -4,30 +4,20 @@ import java.util.List;
 
 import br.luahr.topicos1.dto.UsuarioDTO;
 import br.luahr.topicos1.dto.UsuarioResponseDTO;
-import br.luahr.topicos1.model.Usuario;
-import jakarta.validation.Valid;
 
 public interface UsuarioService {
     
-    List<UsuarioResponseDTO> getAll(int page, int pageSize);
+    public UsuarioResponseDTO insert(UsuarioDTO usuarioDto);
 
-    UsuarioResponseDTO findById(Long id);
+    public UsuarioResponseDTO update(UsuarioDTO usuarioDTO, Long id);
 
-    UsuarioResponseDTO create(@Valid UsuarioDTO productDTO);
+    public void delete(Long id);
 
-    UsuarioResponseDTO update(Long id, UsuarioDTO productDTO);
+    public UsuarioResponseDTO findById(Long id);
 
-    Usuario findByLoginAndSenha(String login, String senha);
+    public List<UsuarioResponseDTO> findByNome(String nome);
 
-    UsuarioResponseDTO update(Long id, String nomeImagem);
+    public List<UsuarioResponseDTO> findByAll();
 
-    UsuarioResponseDTO findByLogin(String login);
-
-    void delete(Long id);
-
-    List<UsuarioResponseDTO> findByNome(String nome, int page, int pageSize);
-
-    long count();
-
-    long countByNome(String nome);
+    public UsuarioResponseDTO findByLoginSenha(String login, String senha);
 }

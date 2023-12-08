@@ -1,4 +1,4 @@
-package br.luahr.topicos1.resource;
+/* package br.luahr.topicos1.resource;
 
 //import java.io.IOException;
 
@@ -46,7 +46,7 @@ public class UsuarioLogadoResource {
         return Response.ok(usuarioResponseDTO).build();
     }
 
- /*    @PATCH
+     @PATCH
     @Path("/novaimagem")
     @RolesAllowed({ "Admin", "User" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -66,7 +66,7 @@ public class UsuarioLogadoResource {
         cliente = usuarioService.update(cliente.id(), nomeImagem);
 
         return Response.ok(cliente).build();
-    } */
+    } 
 
     @GET
     @Path("/download/{nomeImagem}")
@@ -78,3 +78,4 @@ public class UsuarioLogadoResource {
         return response.build();
     }
 }
+ */

@@ -15,6 +15,7 @@ import jakarta.ws.rs.NotFoundException;
 import br.luahr.topicos1.dto.CompraDTO;
 import br.luahr.topicos1.dto.CompraResponseDTO;
 import br.luahr.topicos1.model.Compra;
+import br.luahr.topicos1.model.Flor;
 import br.luahr.topicos1.repository.UsuarioRepository;
 import br.luahr.topicos1.repository.CompraRepository;
 import br.luahr.topicos1.repository.FlorRepository;
@@ -61,8 +62,9 @@ public class CompraServiceImpl implements CompraService {
         // validar(compraDTO);
 
         Compra entity = new Compra();
-        entity.setCliente(compraDTO.usuario());
-        entity.setItemProduto(compraDTO.itemProduto());
+        entity.setUsuario(compraDTO.usuario());
+        Flor flor = florRepository.findById(compraDTO.itemFlor());
+        entity.setItemFlor(flor);
         entity.setQuantidadeProduto(compraDTO.quantidadeProduto());
 
         compraRepository.persist(entity);
@@ -77,8 +79,9 @@ public class CompraServiceImpl implements CompraService {
 
         Compra entity = compraRepository.findById(id);
 
-        entity.setCliente(compraDTO.usuario());
-        entity.setItemProduto(compraDTO.itemProduto());
+        entity.setUsuario(compraDTO.usuario());
+        Flor flor = florRepository.findById(compraDTO.itemFlor());
+        entity.setItemFlor(flor);
         entity.setQuantidadeProduto(compraDTO.quantidadeProduto());
 
         return CompraResponseDTO.valueOf(entity);
@@ -96,15 +99,15 @@ public class CompraServiceImpl implements CompraService {
     }
 
     @Override
-    public List<CompraResponseDTO> findByItemProduto(Integer itemProduto, int page, int pageSize) {
+    public List<CompraResponseDTO> findByItemFlor(Long itemFlor, int page, int pageSize) {
 
-        List<Compra> list = compraRepository.findByItemProduto(itemProduto).page(page, pageSize).list();
+        List<Compra> list = compraRepository.findByItemFlor(itemFlor).page(page, pageSize).list();
         return list.stream().map(e -> CompraResponseDTO.valueOf(e)).collect(Collectors.toList());
 
     }
 
     @Override
-    public long countByItemProduto(Integer itemProduto) {
-        return compraRepository.findByItemProduto(itemProduto).count();
+    public long countByItemFlor(Long itemFlor) {
+        return compraRepository.findByItemFlor(itemFlor).count();
     }
 }
